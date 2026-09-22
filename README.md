@@ -2,9 +2,9 @@
 
 Proyecto final de **Nicolás Puente** · Inteligencia Artificial: Generación de Prompts · Comisión #96165 · Coderhouse (2026).
 
-[![Abrir en Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/nicolaspuente/Proyecto_Coder_Gym/blob/gymia-groq/GymIA_Proyecto_Final_Colab.ipynb)
+[![Abrir en Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/nicolaspuente/Proyecto_Coder_Gym/blob/main/GymIA_Proyecto_Final_Colab.ipynb)
 
-> **Estado:** ampliación con Groq en la rama de revisión `gymia-groq`. La POC previa sigue en `main`. La prueba real de Groq del 22/09/2026 está guardada y evaluada por separado de las respuestas manuales de ChatGPT.
+> **Estado:** proyecto final con prueba real de Groq del 22/09/2026, guardada y evaluada por separado de las respuestas manuales de ChatGPT.
 
 ## Resumen
 
