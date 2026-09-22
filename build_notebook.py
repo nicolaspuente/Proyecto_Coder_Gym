@@ -119,11 +119,42 @@ if RUN_API:
         print(label,'\\n',answer.output_text,'\\n')
 else:
     print('Sin llamadas a API. Los prompts están disponibles para una evaluación manual.')''')
-m('''## 5 · Criterios de evaluación
-Completar esta tabla **después de obtener respuestas reales**. Puntuar 1 si cumple y 0 si falla, con una cita breve de evidencia. Comparar utilidad y errores, no solo estilo.''')
-c('''rubric=pd.DataFrame({'criterio':['cuenta_socios_y_transiciones','distingue_total_de_cohorte','no_inventa_causas_ni_asistencia','no_confunde_ingresos_con_cobros','aplica_regla_estado_confirmada','propone_accion_y_metrica'],
-                     'zero_shot':['pendiente']*6,'dirigido_one_shot':['pendiente']*6,'evidencia':['']*6})
-display(rubric)''')
+m('''## 5 · Respuestas observadas y evaluación
+Los siguientes textos fueron proporcionados por el autor el **22/09/2026** tras probar cada prompt en una conversación nueva de ChatGPT. Se conservan sin reescribir. El modelo exacto y sus ajustes no quedaron registrados; por eso la comparación es **indicativa**, no un experimento controlado. La celda de API anterior es una alternativa reproducible si se desean nuevas respuestas con un modelo especificado.
+
+### Prompt base — respuesta observada
+
+> Entre mayo y junio, el gimnasio pasó de **257 a 311 socios** (+21 %), pero los **activos bajaron de 219 a 187** (−15 %). De los activos de mayo, **105 figuraron inactivos en junio**; volvieron a estar activos 19 que estaban inactivos. Los importes registrados cayeron de $7.735.000 a $6.855.000 (−11 %). Ese importe **no equivale a dinero cobrado**.
+>
+> **Acción sugerida:** revisar primero los 105 casos que pasaron de activo a inactivo y contactarlos para conocer la causa. Antes de atribuir la caída a abandono, verificar los estados según la regla confirmada —activo si tiene al menos una actividad activa—, especialmente en los 63 casos de estado mixto. Sin asistencia, motivos de inactividad ni pagos cobrados, todavía no se puede establecer la causa de la caída.
+
+### Prompt dirigido + one-shot — respuesta observada
+
+> **Hallazgo:** La prioridad es revisar a los 105 socios que pasaron de activos en mayo a inactivos en junio de 2024.
+>
+> **Evidencia:** El JSON registra 105 transiciones de activo a inactivo y 19 en sentido inverso. En los totales mensuales, los socios subieron de 257 a 311 (+54), mientras los activos bajaron de 219 a 187 (−32). La variación del total no describe por sí sola qué ocurrió con los mismos socios.
+>
+> **Límite:** No se conocen asistencia ni causas de inactividad. Los importes registrados bajaron $880.000, de $7.735.000 a $6.855.000; eso no demuestra una caída en lo efectivamente cobrado. La causa del cambio de estado sigue siendo una hipótesis por investigar.
+>
+> **Acción:** Auditar los 105 casos y registrar el motivo verificable de cada cambio.
+>
+> **Métrica:** Casos revisados y con motivo documentado / 105.
+>
+> **Regla aplicada:** Un socio es activo si tiene al menos una actividad activa, incluso si otras figuran inactivas.
+
+**Precisión sobre la respuesta base:** los 63 casos con estados mixtos corresponden a todo 2024. Los datos resumidos enviados al modelo no permiten afirmar cuántos de ellos están entre las 105 transiciones de mayo a junio. La sugerencia de revisarlos es válida como control general, pero no como descripción de esa cohorte.
+
+La rúbrica asigna 1 si cumple el criterio y 0 si no lo cumple. Evalúa solo estas respuestas observadas; no califica la calidad del prompt en general.''')
+c('''rubric=pd.DataFrame([
+    ['Socios y transiciones correctos',1,1,'Ambas: 257→311; 219→187; 105 y 19 transiciones.'],
+    ['Distingue total mensual y cohorte',1,1,'Ambas separan el total de socios de los cambios de estado de los mismos socios.'],
+    ['No inventa causas ni asistencia',1,1,'Ambas declaran que falta conocer causa y asistencia.'],
+    ['No confunde importes con cobros',1,1,'Ambas aclaran que los importes registrados no prueban cobro efectivo.'],
+    ['Aplica la regla confirmada',1,1,'Ambas mencionan activo si tiene al menos una actividad activa.'],
+    ['Propone acción y métrica explícita',0,1,'La base sugiere contacto sin indicador; la mejorada define casos con motivo documentado / 105.']
+],columns=['criterio','zero_shot','dirigido_one_shot','evidencia'])
+display(rubric)
+print('Puntaje base:',int(rubric.zero_shot.sum()),'/6 | mejorado:',int(rubric.dirigido_one_shot.sum()),'/6')''')
 m('''## 6 · Modelo texto a imagen
 La campaña visual se deriva de la **recomendación**, sin pretender que conocemos por qué los socios dejaron de estar activos. Generar la imagen con la herramienta elegida, guardar la imagen y el prompt en el repositorio y evaluar legibilidad, anatomía y adecuación. La consigna permite una herramienta visual externa sin API. No afirmar que su resultado es una campaña probada.''')
 c('''image_prompt='Generate a polished, photorealistic square campaign image asset for a gym reactivation concept in Mendoza, Argentina. An adult woman of ordinary athletic ability returning to a gentle workout with a trainer nearby (non-identifiable generated people), natural body proportions, plausible gym equipment, welcoming and nonjudgmental body language. Contemporary modest gym, authentic lived-in details, warm morning light, deep navy and subtle orange color accents. Leave ample clean negative space in upper left for later typography. NO letters, NO text, NO logos, NO brand names, NO before/after transformations, NO claims or numbers. Camera realism, no overprocessed AI sheen. This is a conceptual illustration, not a photo of an actual client.'
@@ -134,10 +165,10 @@ print(image_prompt)
 # from IPython.display import Image, display
 # display(Image(data=next(iter(uploaded.values()))))''')
 m('''**Resultado generado (22/09/2026):** [campaña conceptual](assets/campana_reactivacion_gymia.jpg). Revisión visual: sin texto, marcas ni promesas; personas adultas y equipamiento plausibles; espacio libre amplio para diseño. Hay una figura de fondo parcialmente recortada, por lo que la pieza exige revisión antes de publicarse como anuncio. No mide eficacia comercial.\n\n![Campaña conceptual GymIA](assets/campana_reactivacion_gymia.jpg)''')
-m('''## 7 · Resultados y conclusiones provisionales
+m('''## 7 · Resultados y conclusiones
 En la fuente hay **4.374 filas por actividad**, **4.174 registros socio-mes** y **650 socios únicos** en 2024. En mayo hay 219 activos de 257 registrados; en junio 187 de 311. Entre los mismos socios presentes en ambos meses, 105 cambian de activo a inactivo y 19 en sentido contrario. Hay 63 grupos socio-mes con estados distintos entre actividades y el consolidado aplica la regla «alguna actividad activa».
 
-**Interpretación:** el caso de junio amerita investigar y probar una campaña de reactivación; estos datos no explican causas ni demuestran el efecto de una acción. La POC valida estructura y limpieza, y documenta los prompts y la imagen generada. La procedencia sintética y la regla de estado fueron confirmadas por el autor. Queda pendiente ejecutar el modelo de texto y documentar la comparación de sus respuestas.''')
+**Conclusión:** el caso de junio amerita investigar las transiciones antes de ensayar una campaña de reactivación. En las respuestas observadas, ambos prompts respetaron las cifras y límites; el dirigido obtuvo **6/6** frente a **5/6** del base al agregar una métrica explícita y presentar el razonamiento con mayor trazabilidad. Esta diferencia en dos respuestas no demuestra que la técnica siempre mejore el resultado. La imagen es una propuesta visual, no una medición de eficacia comercial. La procedencia sintética y la regla de estado fueron confirmadas por el autor. Para una comparación repetible, registrar el modelo exacto y repetir las pruebas con la misma configuración.''')
 n={'cells':C,'metadata':{'kernelspec':{'display_name':'Python 3','language':'python','name':'python3'},'language_info':{'name':'python'}},'nbformat':4,'nbformat_minor':5}
 Path('GymIA_Proyecto_Final_Colab.ipynb').write_text(json.dumps(n,ensure_ascii=False,indent=1),encoding='utf-8')
 print('Notebook written',len(C),'cells')
