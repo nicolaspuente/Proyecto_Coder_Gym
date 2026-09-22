@@ -1,0 +1,46 @@
+{
+  "provider": "Groq",
+  "model_requested": "openai/gpt-oss-20b",
+  "timestamp_utc": "2026-09-22T14:02:28.844477+00:00",
+  "settings": {
+    "temperature": 0,
+    "reasoning_effort": "low",
+    "max_completion_tokens": 1024
+  },
+  "results": {
+    "zero_shot": {
+      "model_returned": "openai/gpt-oss-20b",
+      "text": "## 1. Resumen rápido de los datos\n\n| Mes | Socios | Activos | Inactivos | Ingresos (ARS) |\n|-----|--------|---------|-----------|----------------|\n| Mayo 2024 | 257 | 219 | 38 | 7 735 000 |\n| Junio 2024 | 311 | 187 | 124 | 6 855 000 |\n\n**Transiciones (Mayo → Junio)**  \n- Activo → Inactivo: **105**  \n- Inactivo → Activo: **19**\n\n**Otros indicadores**  \n- Casos de estado mixto (2024): **63**  \n- Datos faltantes: asistencia, causa de inactividad, pagos cobrados.\n\n---\n\n## 2. Interpretación de la situación\n\n| Aspecto | Observación | Implicación |\n|---------|-------------|-------------|\n| **Pérdida de activos** | 219 → 187 (‑32) | 14,6 % de los activos de mayo se convirtieron en inactivos. |\n| **Aumento de inactivos** | 38 → 124 (×3,3) | El número de inactivos se triplicó, lo que indica un problema de retención. |\n| **Ingresos** | 7 735 000 → 6 855 000 (‑11 %) | La caída de ingresos es mayor que la caída de socios, lo que sugiere que los socios que se convirtieron en inactivos también dejaron de pagar. |\n| **Transiciones** | 105 activos → inactivos vs 19 inactivos → activos | La tasa de “deserción” es 5,5 veces mayor que la de “re‑activación”. |\n| **Estado mixto** | 63 casos | Existe una franja de socios que no cumplen claramente con la regla “activo si al menos una actividad está activa”. |\n| **Datos faltantes** | Asistencia, causa de inactividad, pagos cobrados | Sin estos datos no podemos identificar la causa raíz de la deserción ni medir la efectividad de los pagos. |\n\n---\n\n## 3. Diagnóstico principal\n\n1. **Deserción alta y no compensada**  \n   - La mayoría de los socios que se vuelven inactivos no vuelven a activarse.  \n   - La caída de ingresos es mayor que la caída de socios, lo que indica que los socios inactivos dejan de pagar.\n\n2. **Falta de visibilidad**  \n   - No se conoce la asistencia real ni la causa de inactividad.  \n   - No se sabe si los pagos se están cobrando efectivamente.\n\n3. **Estado mixto**  \n   - 63 socios están en una zona gris (por ejemplo, pagaron pero no asistieron, o asistieron pero no pagaron).  \n   - Esto genera incertidumbre en la contabilidad y en la planificación de recursos.\n\n---\n\n## 4. Acción recomendada: **Implementar un programa de “Re‑engagement” con seguimiento de métricas clave**\n\n### 4.1. Objetivo\nReducir la tasa de deserción activa‑inactiva a ≤ 20 % y aumentar la tasa de re‑activación a ≥ 30 % en los próximos 3 meses.\n\n### 4.2. Pasos concretos\n\n| Paso | Acción | Responsable | Tiempo estimado |\n|------|--------|-------------|-----------------|\n| 1 | **Recolectar datos faltantes** (asistencia, causa de inactividad, pagos cobrados) | Equipo de IT + Administración | 1 semana |\n| 2 | **Segmentar socios inactivos** por duración de inactividad, historial de pagos y actividades previas | Analista de datos | 2 días |\n| 3 | **Diseñar campaña de re‑engagement** (mensajes personalizados, ofertas de descuento, recordatorios de beneficios) | Marketing | 1 semana |\n| 4 | **Implementar sistema de notificaciones** (SMS/WhatsApp/Email) con recordatorios de pago y recordatorios de actividad | IT | 3 días |\n| 5 | **Ofrecer “trial” de 1 semana** a socios inactivos para que prueben nuevas clases o horarios | Operaciones | 1 semana |\n| 6 | **Monitorear métricas**: tasa de re‑activación, ingresos recuperados, asistencia de los re‑activados | Analista de datos | Continuo |\n| 7 | **Ajustar la regla de estado mixto**: definir criterios claros (p.ej., 3 pagos en los últimos 3 meses y 2 asistencias) | Equipo de control | 1 día |\n| 8",
+      "usage": {
+        "completion_tokens": 1024,
+        "prompt_tokens": 282,
+        "total_tokens": 1306,
+        "completion_time": 1.156338252,
+        "completion_tokens_details": {
+          "reasoning_tokens": 8
+        },
+        "prompt_time": 0.013634947,
+        "prompt_tokens_details": null,
+        "queue_time": 0.364207087,
+        "total_time": 1.169973199
+      }
+    },
+    "dirigido_one_shot": {
+      "model_returned": "openai/gpt-oss-20b",
+      "text": "**Hallazgo**: 105 socios pasaron de activo a inactivo de mayo a junio, representando un 40.8 % de los socios activos de mayo (105/257).  \n**Evidencia**: registro de transición “activo_a_inactivo” = 105 en el JSON.  \n**Límite**: no se dispone de causa de inactividad ni de datos de asistencia o pagos cobrados.  \n**Acción**: implementar un proceso de “re‑activación” que envíe un mensaje personalizado a los 105 socios inactivos, solicitando una breve encuesta sobre su experiencia y ofreciendo un incentivo de re‑inscripción.  \n**Métrica**: tasa de respuesta a la encuesta y número de re‑inscripciones generadas.  \n**Regla aplicada**: “Activo si al menos una actividad está activa” (confirmada 22/09/2026).",
+      "usage": {
+        "completion_tokens": 202,
+        "prompt_tokens": 549,
+        "total_tokens": 751,
+        "completion_time": 0.213325293,
+        "completion_tokens_details": {
+          "reasoning_tokens": 5
+        },
+        "prompt_time": 0.033258593,
+        "prompt_tokens_details": null,
+        "queue_time": 0.033259479,
+        "total_time": 0.246583886
+      }
+    }
+  }
+}

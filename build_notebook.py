@@ -101,26 +101,54 @@ FORMATO: Hallazgo | Evidencia | Límite | Acción | Métrica | Regla aplicada. M
 AMBIGÜEDAD: si falta una regla de negocio, declararla como supuesto antes de concluir.
 {example}"""
 print('PROMPT BASE\\n',baseline,'\\n\\nPROMPT MEJORADO\\n',improved)''')
-m('''## 4 · Prueba opcional del modelo de texto
-Esta celda hace **dos llamadas** y puede generar costo. Mantener `RUN_API=False` para revisión sin API. Si se prueba manualmente en ChatGPT, pegar las respuestas reales en el informe con fecha y modelo usado. Nunca subir una clave de API al repositorio.''')
-c('''RUN_API=False
-MODEL='gpt-4.1-mini'  # Ejemplo; verificar acceso y precio en la cuenta antes de ejecutar.
-answers={}
-if RUN_API:
+m('''## 4 · Modelo de texto en vivo mediante Groq
+Groq ofrece una API de inferencia con plan gratuito sujeto a límites. Esta POC utiliza **`openai/gpt-oss-20b` servido por Groq** para comparar los dos prompts con el mismo modelo y ajustes. No es el modelo exacto de las pruebas manuales de ChatGPT de la sección siguiente. La imagen del proyecto fue generada con otra herramienta; Groq se usa aquí solo para texto.
+
+1. Crear una clave en [Groq Console](https://console.groq.com/keys) y mantener la cuenta en el plan gratuito si no se desea pagar.
+2. Cambiar `RUN_GROQ` a `True` en la celda siguiente. Al ejecutarla, pegar la clave cuando aparezca el campo oculto. **No escribirla en el código, no guardarla en el notebook ni subirla a GitHub.**
+3. Se harán exactamente dos llamadas independientes. Descargar `gymia_resultados_groq.json` desde el panel de archivos de Colab y compartir ese archivo para incorporarlo al repositorio y evaluar esas respuestas.
+
+Con `RUN_GROQ=False`, «Ejecutar todo» completa las partes sin clave y conserva las respuestas manuales anteriores. Las respuestas de Groq no deben recibir por anticipado los puntajes obtenidos en ChatGPT.''')
+c('''RUN_GROQ=False  # True: dos consultas reales a Groq; False: revisar el cuaderno sin clave.
+GROQ_MODEL='openai/gpt-oss-20b'
+groq_run=None
+if RUN_GROQ:
     import importlib.util, subprocess, sys
-    if importlib.util.find_spec('openai') is None:
-        subprocess.check_call([sys.executable,'-m','pip','install','-q','openai'])
-    from openai import OpenAI
     from getpass import getpass
-    client=OpenAI(api_key=getpass('Clave API (no se guarda): '))
+    from datetime import datetime, timezone
+    from pathlib import Path
+    if importlib.util.find_spec('groq') is None:
+        subprocess.check_call([sys.executable,'-m','pip','install','-q','groq'])
+    from groq import Groq
+    api_key=getpass('GROQ_API_KEY (entrada oculta, no se guarda): ').strip()
+    if not api_key:
+        raise ValueError('Se necesita una clave de Groq para ejecutar esta celda.')
+    client=Groq(api_key=api_key)
+    del api_key
+    groq_run={'provider':'Groq','model_requested':GROQ_MODEL,
+              'timestamp_utc':datetime.now(timezone.utc).isoformat(),
+              'settings':{'temperature':0,'reasoning_effort':'low','max_completion_tokens':1024},
+              'results':{}}
     for label,prompt in [('zero_shot',baseline),('dirigido_one_shot',improved)]:
-        answer=client.responses.create(model=MODEL,input=prompt)
-        answers[label]=answer.output_text
-        print(label,'\\n',answer.output_text,'\\n')
+        response=client.chat.completions.create(
+            model=GROQ_MODEL,
+            messages=[{'role':'user','content':prompt}],
+            temperature=0,
+            reasoning_effort='low',
+            max_completion_tokens=1024,
+        )
+        result={'model_returned':response.model,
+                'text':response.choices[0].message.content or '',
+                'usage':response.usage.model_dump() if response.usage else None}
+        groq_run['results'][label]=result
+        print('\\n---',label,'---\\n',result['text'])
+    Path('gymia_resultados_groq.json').write_text(
+        json.dumps(groq_run,ensure_ascii=False,indent=2),encoding='utf-8')
+    print('Resultados y metadatos guardados en gymia_resultados_groq.json. Descargá el archivo desde Colab.')
 else:
-    print('Sin llamadas a API. Los prompts están disponibles para una evaluación manual.')''')
+    print('Groq desactivado. Activá RUN_GROQ=True para obtener dos respuestas nuevas de IA.')''')
 m('''## 5 · Respuestas observadas y evaluación
-Los siguientes textos fueron proporcionados por el autor el **22/09/2026** tras probar cada prompt en una conversación nueva de ChatGPT. Se conservan sin reescribir. El modelo exacto y sus ajustes no quedaron registrados; por eso la comparación es **indicativa**, no un experimento controlado. La celda de API anterior es una alternativa reproducible si se desean nuevas respuestas con un modelo especificado.
+Los siguientes textos fueron proporcionados por el autor el **22/09/2026** tras probar cada prompt en una conversación nueva de ChatGPT. Se conservan sin reescribir. El modelo exacto y sus ajustes no quedaron registrados; por eso la comparación es **indicativa**, no un experimento controlado. La celda anterior permite hacer una **nueva** comparación con Groq, con modelo y ajustes registrados; sus respuestas se evalúan por separado.
 
 ### Prompt base — respuesta observada
 
@@ -168,7 +196,7 @@ m('''**Resultado generado (22/09/2026):** [campaña conceptual](assets/campana_r
 m('''## 7 · Resultados y conclusiones
 En la fuente hay **4.374 filas por actividad**, **4.174 registros socio-mes** y **650 socios únicos** en 2024. En mayo hay 219 activos de 257 registrados; en junio 187 de 311. Entre los mismos socios presentes en ambos meses, 105 cambian de activo a inactivo y 19 en sentido contrario. Hay 63 grupos socio-mes con estados distintos entre actividades y el consolidado aplica la regla «alguna actividad activa».
 
-**Conclusión:** el caso de junio amerita investigar las transiciones antes de ensayar una campaña de reactivación. En las respuestas observadas, ambos prompts respetaron las cifras y límites; el dirigido obtuvo **6/6** frente a **5/6** del base al agregar una métrica explícita y presentar el razonamiento con mayor trazabilidad. Esta diferencia en dos respuestas no demuestra que la técnica siempre mejore el resultado. La imagen es una propuesta visual, no una medición de eficacia comercial. La procedencia sintética y la regla de estado fueron confirmadas por el autor. Para una comparación repetible, registrar el modelo exacto y repetir las pruebas con la misma configuración.''')
+**Conclusión:** el caso de junio amerita investigar las transiciones antes de ensayar una campaña de reactivación. En las respuestas manuales de ChatGPT, ambos prompts respetaron las cifras y límites; el dirigido obtuvo **6/6** frente a **5/6** del base al agregar una métrica explícita y presentar el razonamiento con mayor trazabilidad. Esta diferencia en dos respuestas no demuestra que la técnica siempre mejore el resultado. La imagen es una propuesta visual, no una medición de eficacia comercial. La procedencia sintética y la regla de estado fueron confirmadas por el autor. La prueba opcional con Groq permitirá evaluar por separado un modelo identificado, una vez que se ejecute y se guarden sus salidas.''')
 n={'cells':C,'metadata':{'kernelspec':{'display_name':'Python 3','language':'python','name':'python3'},'language_info':{'name':'python'}},'nbformat':4,'nbformat_minor':5}
 Path('GymIA_Proyecto_Final_Colab.ipynb').write_text(json.dumps(n,ensure_ascii=False,indent=1),encoding='utf-8')
 print('Notebook written',len(C),'cells')
