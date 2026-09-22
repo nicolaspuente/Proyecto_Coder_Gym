@@ -2,9 +2,9 @@
 
 Proyecto final de **Nicolás Puente** · Inteligencia Artificial: Generación de Prompts · Comisión #96165 · Coderhouse (2026).
 
-[![Abrir en Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/nicolaspuente/Proyecto_Coder_Gym/blob/gymia-poc-colab/GymIA_Proyecto_Final_Colab.ipynb)
+[![Abrir en Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/nicolaspuente/Proyecto_Coder_Gym/blob/main/GymIA_Proyecto_Final_Colab.ipynb)
 
-> **Estado:** POC documentada en la rama de revisión. El enlace de Colab abre el cuaderno con los resultados y la comparación de prompts. Falta registrar el modelo exacto usado en las pruebas manuales si se desea una comparación controlada.
+> **Estado:** POC incorporada a `main`. El enlace de Colab abre el cuaderno con los resultados y la comparación de prompts. Falta registrar el modelo exacto usado en las pruebas manuales si se desea una comparación controlada.
 
 ## Resumen
 
