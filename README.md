@@ -4,7 +4,7 @@ Proyecto final de **Nicolás Puente** · Inteligencia Artificial: Generación de
 
 [![Abrir en Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/nicolaspuente/Proyecto_Coder_Gym/blob/gymia-poc-colab/GymIA_Proyecto_Final_Colab.ipynb)
 
-> **Estado:** borrador verificable de la POC. El enlace de Colab abre el borrador en la rama de revisión. Falta documentar las respuestas reales de los prompts de texto, su evaluación y confirmar la regla de negocio del estado general.
+> **Estado:** borrador verificable de la POC. El enlace de Colab abre el borrador en la rama de revisión. Falta ejecutar los prompts de texto con el mismo modelo, conservar sus respuestas reales y completar la evaluación.
 
 ## Resumen
 
@@ -19,7 +19,7 @@ Un archivo contiene una fila por actividad del socio y por mes: contar filas com
 - `DATASETGYM.csv`: 4.374 registros de socio, actividad y mes.
 - `Socios_Mes.csv`: 4.174 registros únicos de socio y mes, para 650 ID únicos en 2024.
 - El cuaderno compara ambos archivos en una revisión fija y verifica cantidades de actividades, estados, suma de cuotas/inscripciones y totales.
-- Hay 63 grupos socio-mes con actividades en estados diferentes. El consolidado aplica «Activo si al menos una actividad está activa»; **es una regla inferida del CSV, aún pendiente de confirmación comercial**.
+- Hay 63 grupos socio-mes con actividades en estados diferentes. El consolidado aplica «Activo si al menos una actividad está activa»; **regla de negocio confirmada por el autor el 22/09/2026**.
 - Se calculan indicadores en Pandas antes de pasarlos a los prompts. No se envían nombres, edades, localidades ni identificadores personales al modelo.
 - Se comparan un prompt directo sin ejemplos y otro con estructura, restricciones, un ejemplo de salida y manejo de ambigüedades. La evaluación usa una rúbrica de seis criterios.
 - Un prompt de texto a imagen creó la [campaña conceptual](assets/campana_reactivacion_gymia.jpg). Se conserva el prompt exacto en el cuaderno.
@@ -45,7 +45,7 @@ Entre socios presentes en ambos meses, **105 pasaron de activo a inactivo** y **
 
 ## Resultados y conclusiones
 
-Se validó la consistencia aritmética entre ambas tablas y se evitó confundir filas de actividad con socios. La prueba encontró un cambio concreto entre mayo y junio. La pieza visual generada es coherente con una invitación a retomar actividad, pero no demuestra eficacia comercial. **La comparación de calidad entre prompts de texto queda pendiente de ejecutar y evaluar**, y la regla comercial del estado general requiere confirmación.
+Se validó la consistencia aritmética entre ambas tablas y se evitó confundir filas de actividad con socios. La prueba encontró un cambio concreto entre mayo y junio. La pieza visual generada es coherente con una invitación a retomar actividad, pero no demuestra eficacia comercial. **La comparación de calidad entre prompts de texto queda pendiente de ejecutar y evaluar**.
 
 ## Referencias
 

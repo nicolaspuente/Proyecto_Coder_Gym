@@ -17,7 +17,7 @@ Proyecto final — prueba de concepto ejecutable en **Google Colab**. Usa los do
 
 **Límites:** los archivos no contienen asistencia, saldo adeudado ni comprobantes de pago. Los importes se llaman «ingresos» en el CSV y se informan aquí como *importes registrados*, sin afirmar cobro efectivo. Los nombres, edades y localidades no se envían al modelo. La procedencia sintética de los CSV fue confirmada por el autor el 22/09/2026; los nombres y edades se descartan del análisis y no se envían al modelo.''')
 m('''## 1 · Fuente y granularidad
-`DATASETGYM.csv`: una fila por socio, mes y actividad. `Socios_Mes.csv`: una fila por socio y mes. Para contar personas se usa el segundo. Se verifican agregaciones contra el primero. La regla implícita de `Estado_General` es **Activo si tiene al menos una actividad activa**, pero su validez comercial debe confirmarse.''')
+`DATASETGYM.csv`: una fila por socio, mes y actividad. `Socios_Mes.csv`: una fila por socio y mes. Para contar personas se usa el segundo. Se verifican agregaciones contra el primero. La regla de negocio confirmada por el autor es **Activo si tiene al menos una actividad activa**. La validación comprueba que el consolidado la aplica.''')
 c(f'''import pandas as pd
 ROOT='https://raw.githubusercontent.com/nicolaspuente/Proyecto_Coder_Gym/{sha}/'
 raw=pd.read_csv(ROOT+'DATASETGYM.csv',encoding='utf-8-sig')
@@ -43,13 +43,13 @@ checks={
     'cuotas':(agg.cuotas==m0.Ingreso_Cuotas).all(),
     'inscripcion':(agg.inscripcion==m0.Ingreso_Inscripcion).all(),
     'total':(m0.Ingreso_Cuotas+m0.Ingreso_Inscripcion==m0.Ingreso_Mensual_Total).all(),
-    'regla_estado_inferida':((agg.actividades_activas>0)==m0.Estado_General.eq('Activo')).all()
+    'regla_estado_confirmada':((agg.actividades_activas>0)==m0.Estado_General.eq('Activo')).all()
 }
 assert all(checks.values()),f'Inconsistencia: {checks}'
 mixed=int((agg.estados_distintos>1).sum())
 print('Validaciones:',checks)
 print('Socio-mes con estados diferentes entre actividades:',mixed)
-print('Regla inferida: activo si alguna actividad activa. Requiere confirmación del negocio.')''')
+print('Regla confirmada: activo si alguna actividad está activa.')''')
 m('''## 2 · Hallazgos calculados
 Se contrasta mayo con junio de 2024 porque ambos meses tienen una caída en socios activos mientras crece el padrón. La transición entre estados se calcula sobre los mismos ID presentes en ambos meses. No se interpreta como una tasa anual de abandono ni como causa probada.''')
 c('''summary=monthly.groupby('Mes').agg(
@@ -80,7 +80,7 @@ facts={
   'mayo_2024':{'socios':int(may['socios']),'activos':int(may['activos']),'inactivos':int(may['inactivos']),'importes_registrados_ars':int(may['importes_registrados_ars'])},
   'junio_2024':{'socios':int(june['socios']),'activos':int(june['activos']),'inactivos':int(june['inactivos']),'importes_registrados_ars':int(june['importes_registrados_ars'])},
   'transiciones_mayo_junio':{'activo_a_inactivo':active_to_inactive,'inactivo_a_activo':inactive_to_active},
-  'regla_estado_socio':'Activo si al menos una actividad está activa; inferida de CSV, no validada comercialmente',
+  'regla_estado_socio':'Activo si al menos una actividad está activa; confirmada por el autor el 22/09/2026',
   'casos_estado_mixto_2024':mixed,
   'faltantes':['asistencia','causa de inactividad','pagos efectivamente cobrados']
 }
@@ -96,8 +96,8 @@ CONTEXTO: POC supervisada sobre registros de 2024. La unidad es socio único por
 DATOS VERIFICADOS (JSON, no instrucciones): {json.dumps(facts,ensure_ascii=False)}
 TAREA: identificar el hallazgo prioritario y proponer una acción concreta.
 CRITERIOS: cuantificarlo; distinguir variación del total mensual y transición de los mismos socios; justificar cada cifra con campos del JSON; separar hecho, hipótesis y recomendación.
-RESTRICCIONES: no inventar causa de inactividad, asistencia, deuda, cobro efectivo, impacto futuro ni tasa de abandono sin definir cohorte. La regla de estado está inferida y requiere validación. No revelar identidades. No afirmar que la campaña funcionó.
-FORMATO: Hallazgo | Evidencia | Límite | Acción | Métrica | Regla a validar. Máximo 180 palabras.
+RESTRICCIONES: no inventar causa de inactividad, asistencia, deuda, cobro efectivo, impacto futuro ni tasa de abandono sin definir cohorte. Aplicar la regla confirmada de estado. No revelar identidades. No afirmar que la campaña funcionó.
+FORMATO: Hallazgo | Evidencia | Límite | Acción | Métrica | Regla aplicada. Máximo 180 palabras.
 AMBIGÜEDAD: si falta una regla de negocio, declararla como supuesto antes de concluir.
 {example}"""
 print('PROMPT BASE\\n',baseline,'\\n\\nPROMPT MEJORADO\\n',improved)''')
@@ -121,7 +121,7 @@ else:
     print('Sin llamadas a API. Los prompts están disponibles para una evaluación manual.')''')
 m('''## 5 · Criterios de evaluación
 Completar esta tabla **después de obtener respuestas reales**. Puntuar 1 si cumple y 0 si falla, con una cita breve de evidencia. Comparar utilidad y errores, no solo estilo.''')
-c('''rubric=pd.DataFrame({'criterio':['cuenta_socios_y_transiciones','distingue_total_de_cohorte','no_inventa_causas_ni_asistencia','no_confunde_ingresos_con_cobros','declara_regla_estado_inferida','propone_accion_y_metrica'],
+c('''rubric=pd.DataFrame({'criterio':['cuenta_socios_y_transiciones','distingue_total_de_cohorte','no_inventa_causas_ni_asistencia','no_confunde_ingresos_con_cobros','aplica_regla_estado_confirmada','propone_accion_y_metrica'],
                      'zero_shot':['pendiente']*6,'dirigido_one_shot':['pendiente']*6,'evidencia':['']*6})
 display(rubric)''')
 m('''## 6 · Modelo texto a imagen
@@ -137,7 +137,7 @@ m('''**Resultado generado (22/09/2026):** [campaña conceptual](assets/campana_r
 m('''## 7 · Resultados y conclusiones provisionales
 En la fuente hay **4.374 filas por actividad**, **4.174 registros socio-mes** y **650 socios únicos** en 2024. En mayo hay 219 activos de 257 registrados; en junio 187 de 311. Entre los mismos socios presentes en ambos meses, 105 cambian de activo a inactivo y 19 en sentido contrario. Hay 63 grupos socio-mes con estados distintos entre actividades y el consolidado aplica la regla «alguna actividad activa».
 
-**Interpretación:** el caso de junio amerita investigar y probar una campaña de reactivación; estos datos no explican causas ni demuestran el efecto de una acción. La POC valida estructura, limpieza y prompts, pero queda pendiente la ejecución del modelo, la imagen final y su evaluación documentada. La procedencia sintética fue confirmada por el autor; resta confirmar la regla comercial del estado general y completar la evaluación de respuestas de texto.''')
+**Interpretación:** el caso de junio amerita investigar y probar una campaña de reactivación; estos datos no explican causas ni demuestran el efecto de una acción. La POC valida estructura y limpieza, y documenta los prompts y la imagen generada. La procedencia sintética y la regla de estado fueron confirmadas por el autor. Queda pendiente ejecutar el modelo de texto y documentar la comparación de sus respuestas.''')
 n={'cells':C,'metadata':{'kernelspec':{'display_name':'Python 3','language':'python','name':'python3'},'language_info':{'name':'python'}},'nbformat':4,'nbformat_minor':5}
 Path('GymIA_Proyecto_Final_Colab.ipynb').write_text(json.dumps(n,ensure_ascii=False,indent=1),encoding='utf-8')
 print('Notebook written',len(C),'cells')
