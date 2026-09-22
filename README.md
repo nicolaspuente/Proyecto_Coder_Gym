@@ -2,9 +2,9 @@
 
 Proyecto final de **Nicolás Puente** · Inteligencia Artificial: Generación de Prompts · Comisión #96165 · Coderhouse (2026).
 
-[![Abrir en Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/nicolaspuente/Proyecto_Coder_Gym/blob/main/GymIA_Proyecto_Final_Colab.ipynb)
+[![Abrir en Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/nicolaspuente/Proyecto_Coder_Gym/blob/gymia-groq/GymIA_Proyecto_Final_Colab.ipynb)
 
-> **Estado:** POC incorporada a `main`. El enlace de Colab abre el cuaderno con los resultados y la comparación de prompts. Falta registrar el modelo exacto usado en las pruebas manuales si se desea una comparación controlada.
+> **Estado:** ampliación con Groq en la rama de revisión `gymia-groq`. La POC previa sigue en `main`. Las respuestas históricas de ChatGPT permanecen documentadas por separado; las de Groq aún deben ejecutarse y evaluarse.
 
 ## Resumen
 
@@ -21,7 +21,8 @@ Un archivo contiene una fila por actividad del socio y por mes: contar filas com
 - El cuaderno compara ambos archivos en una revisión fija y verifica cantidades de actividades, estados, suma de cuotas/inscripciones y totales.
 - Hay 63 grupos socio-mes con actividades en estados diferentes. El consolidado aplica «Activo si al menos una actividad está activa»; **regla de negocio confirmada por el autor el 22/09/2026**.
 - Se calculan indicadores en Pandas antes de pasarlos a los prompts. No se envían nombres, edades, localidades ni identificadores personales al modelo.
-- Se comparan un prompt directo sin ejemplos y otro con estructura, restricciones, un ejemplo de salida y manejo de ambigüedades. El autor aportó las dos respuestas observadas y se evaluaron con una rúbrica de seis criterios. El modelo exacto no quedó registrado.
+- Se comparan un prompt directo sin ejemplos y otro con estructura, restricciones, un ejemplo de salida y manejo de ambigüedades. El autor aportó dos respuestas manuales de ChatGPT que se evaluaron con una rúbrica de seis criterios. El modelo exacto de esas respuestas no quedó registrado.
+- La nueva integración permite probar ambos prompts desde Colab con `openai/gpt-oss-20b` servido por **Groq**, guardando modelo, fecha, configuración, respuestas y uso de tokens en un JSON. Es una nueva prueba; sus resultados no heredan las puntuaciones de ChatGPT.
 - Un prompt de texto a imagen creó la [campaña conceptual](assets/campana_reactivacion_gymia.jpg). Se conserva el prompt exacto en el cuaderno.
 
 ## Resultados calculados
@@ -39,20 +40,21 @@ Entre socios presentes en ambos meses, **105 pasaron de activo a inactivo** y **
 
 1. Abrir `GymIA_Proyecto_Final_Colab.ipynb` en Google Colab y ejecutar las celdas en orden. El cuaderno descarga los CSV de una revisión fija de este repositorio.
 2. Revisar validaciones e indicadores.
-3. Revisar las dos respuestas manuales aportadas por el autor y la rúbrica ya completada. Para repetir la comparación con un modelo controlado, cambiar `RUN_API=True` en la celda opcional; se solicita la clave de forma interactiva y se hacen **dos llamadas** que pueden generar costo. No publicar claves.
-4. Si se repite la prueba, registrar modelo, fecha, respuestas y costo; evaluar las nuevas respuestas por separado.
+3. Para ejecutar IA en el cuaderno, crear una [clave de Groq](https://console.groq.com/keys), usar una cuenta de plan gratuito y cambiar `RUN_GROQ=True` en la celda 4. Al ejecutarla se solicita la clave de forma oculta y se hacen **dos consultas**. No pegar la clave en el código ni subirla a GitHub. El plan gratuito está sujeto a límites; si la cuenta se cambia a un plan pago, pueden aplicarse cargos.
+4. Descargar `gymia_resultados_groq.json` desde el panel de archivos de Colab. Evaluar esas dos respuestas con la misma rúbrica, por separado de las respuestas manuales de ChatGPT.
 5. Revisar la imagen conceptual, el prompt que la generó y sus limitaciones.
 
 ## Resultados y conclusiones
 
 Se validó la consistencia aritmética entre ambas tablas y se evitó confundir filas de actividad con socios. La prueba encontró un cambio concreto entre mayo y junio. La pieza visual generada es coherente con una invitación a retomar actividad, pero no demuestra eficacia comercial.
 
-Las dos respuestas observadas respetan las cifras principales, la regla de estado y los límites del dataset. La rúbrica da **5/6 al prompt base** y **6/6 al dirigido con ejemplo**: la respuesta base propone contactar a los socios, pero no define una métrica; la mejorada propone auditar los 105 casos y medir cuántos quedan con motivo documentado. Es una comparación de dos respuestas, sin identificación del modelo exacto ni réplicas; no permite afirmar superioridad general de la técnica. Los 63 casos de estados mixtos abarcan todo 2024 y no se deben atribuir automáticamente al grupo de 105 transiciones de mayo a junio.
+Las dos respuestas manuales de ChatGPT respetan las cifras principales, la regla de estado y los límites del dataset. La rúbrica da **5/6 al prompt base** y **6/6 al dirigido con ejemplo**: la respuesta base propone contactar a los socios, pero no define una métrica; la mejorada propone auditar los 105 casos y medir cuántos quedan con motivo documentado. Es una comparación de dos respuestas, sin identificación del modelo exacto ni réplicas; no permite afirmar superioridad general de la técnica. Los 63 casos de estados mixtos abarcan todo 2024 y no se deben atribuir automáticamente al grupo de 105 transiciones de mayo a junio. La nueva prueba con Groq quedará documentada cuando se ejecute.
 
 ## Referencias
 
 - Material de clase y consignas de «Inteligencia Artificial: Generación de Prompts», Coderhouse, comisión #96165.
 - [Documentación oficial de OpenAI: primera llamada a API](https://platform.openai.com/docs/quickstart/make-your-first-api-request).
+- [Groq Quickstart](https://console.groq.com/docs/quickstart) y [límites del plan gratuito](https://console.groq.com/docs/rate-limits).
 - Fuente de datos: los dos CSV de este repositorio.
 
 **Nota sobre datos:** el autor confirmó el 22/09/2026 que los CSV son sintéticos y autorizó su publicación. La POC no necesita nombres ni edades y descarta esas columnas al leerlas.
